@@ -6,6 +6,7 @@ import {useSessionStorage} from "../hooks/useSessionStorage";
 import SpotifyIcon from "../components/icons/SpotifyIcon";
 import {useRouter} from "next/router";
 import {SaxophoneIcon} from "../components/icons/SaxophoneIcon";
+import Btn from "../components/general/Btn";
 
 export default function Home({children}) {
     const router = useRouter();
@@ -17,8 +18,8 @@ export default function Home({children}) {
         fetch('/api/spotify/authorizeURL')
             .then(response => response.json())
             .then(response => {
-            window.location.href = response.url;
-        })
+                window.location.href = response.url;
+            })
     }
 
     // Save Spotify access token to session storage
@@ -92,28 +93,30 @@ export default function Home({children}) {
             </div>
             }
             {(!spotifyProfileExists() && !dataLoading) &&
-            <button onClick={spotifyLogin} type="button"
-                    className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
+            <Btn onClick={spotifyLogin}>
                 <SpotifyIcon className="text-xl mr-2"/>
                 Zaloguj się przez Spotify
-            </button>
+            </Btn>
             }
             {spotifyProfileExists() &&
             <div className={clsx('flex items-center dark:text-white', {
                 'hidden': dataLoading,
                 'visible': !dataLoading
             })}>
-                <Image className={"w-10 h-10 rounded-full mr-2"} width="32px" height="32px" src={spotifyProfileImage()} alt=""/>
+                <Image className={"w-10 h-10 rounded-full mr-2"} width="32px" height="32px" src={spotifyProfileImage()}
+                       alt=""/>
                 <p className="ml-2">Zalogowany jako {spotifyProfile?.display_name}</p>
             </div>
             }
             {spotifyProfileExists() &&
             <p className="inline-block">
-                <Link href='/app'>
-                    <button className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex items-center px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
-                        <SaxophoneIcon className="text-xl" />
-                        <span className="ml-4">Przejdź do aplikacji</span>
-                    </button>
+                <Link href={'/app'}>
+                    <a>
+                        <Btn className="mt-4">
+                            <SaxophoneIcon className="text-xl"/>
+                            <span className="ml-4">Przejdź do aplikacji</span>
+                        </Btn>
+                    </a>
                 </Link>
             </p>
             }
