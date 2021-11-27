@@ -1,23 +1,70 @@
 import clsx from "clsx";
 import Link from "next/link";
 import Image from "next/image"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useSessionStorage} from "../hooks/useSessionStorage";
 import SpotifyIcon from "../components/icons/SpotifyIcon";
+import {useRouter} from "next/router";
+import {SaxophoneIcon} from "../components/icons/SaxophoneIcon";
 
 export default function Home({children}) {
+    const router = useRouter();
     const [dataLoading, setLoading] = useState(false);
     const [spotifyProfile, setProfile] = useSessionStorage('spoitfyProfile', null);
     const [spotifyToken, setToken] = useSessionStorage('spotifyToken', null)
 
     function spotifyLogin() {
-        window.location.href = '123'// createAuthorizationURL();
+        fetch('/api/spotify/authorizeURL')
+            .then(response => response.json())
+            .then(response => {
+            window.location.href = response.url;
+        })
     }
+
+    // Save Spotify access token to session storage
+    useEffect(() => {
+        // Remove hash from response
+        const locationString = location?.hash.replaceAll("#", "");
+        const authObject = Object.fromEntries(new URLSearchParams(locationString));
+        // Save access token with expiration date
+        if (authObject.access_token) {
+            const date = new Date()
+            setToken({
+                token: authObject.access_token,
+                expires_in: date.setHours(date.getHours() + 1)
+            });
+            router.push('/')
+        }
+    })
+
+    /**
+     * Fetch Spotify profile data using access token
+     */
+    function loadProfile() {
+        if (spotifyToken !== null && spotifyProfile === null) {
+            setLoading(true);
+            fetch(`/api/spotify/getMe?token=${spotifyToken.token}`).then(response => response.json()).then(response => {
+                setProfile(response.profile);
+                setTimeout(() => {
+                    setLoading(false)
+                }, 500);
+            })
+        }
+    }
+
+    useEffect(() => {
+        loadProfile();
+    }, [spotifyToken])
 
     function spotifyProfileExists() {
         return spotifyProfile !== null
     }
 
+    /**
+     * Return profile image from Spotify if user has Facebook connection
+     * or return common user icon placeholder
+     * @returns {string|*}
+     */
     function spotifyProfileImage() {
         if (spotifyProfileExists() && spotifyProfile?.images) {
             return spotifyProfile.images[0].url;
@@ -56,14 +103,17 @@ export default function Home({children}) {
                 'hidden': dataLoading,
                 'visible': !dataLoading
             })}>
-                <Image className={"w-10 h-10 rounded-full mr-2"} layout='fill' src={spotifyProfileImage()} alt=""/>
-                <span>Zalogowany jako {spotifyProfile?.display_name}</span>
+                <Image className={"w-10 h-10 rounded-full mr-2"} width="32px" height="32px" src={spotifyProfileImage()} alt=""/>
+                <p className="ml-2">Zalogowany jako {spotifyProfile?.display_name}</p>
             </div>
             }
             {spotifyProfileExists() &&
             <p className="inline-block">
                 <Link href='/app'>
-                    <button className="mt-4" icon={'fxemoji:saxophone'}>Przejdź do aplikacji</button>
+                    <button className="rounded-lg mt-4 border border-gray-200 bg-white text-sm font-medium flex items-center px-4 py-2 text-gray-900 hover:bg-gray-100 hover:text-green-700 focus:z-10 focus:ring-2 focus:ring-green-600 focus:text-green-700 mr-3 mb-3">
+                        <SaxophoneIcon className="text-xl" />
+                        <span className="ml-4">Przejdź do aplikacji</span>
+                    </button>
                 </Link>
             </p>
             }
