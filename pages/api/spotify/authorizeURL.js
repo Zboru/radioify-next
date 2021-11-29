@@ -1,9 +1,15 @@
 import {spotifyApi} from "../../../utils/spotify";
 
 function createAuthorizationURL() {
+    const scopes = [
+        'playlist-modify-public',
+        'playlist-modify-private',
+        'playlist-read-private',
+    ];
     let url = 'https://accounts.spotify.com/authorize';
     url += '?response_type=token';
     url += '&client_id=' + encodeURIComponent(spotifyApi.getClientId());
+    url += '&scope=' + encodeURIComponent(scopes.join(' '));
     url += '&redirect_uri=' + encodeURIComponent(spotifyApi.getRedirectURI());
     url += '&show_dialog=true';
 
