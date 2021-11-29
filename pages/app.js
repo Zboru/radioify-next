@@ -3,11 +3,13 @@ import Step1 from "../components/steps/Step1";
 import Step2 from "../components/steps/Step2";
 import subDays from "date-fns/subDays";
 import Step3 from "../components/steps/Step3";
+import Step4 from "../components/steps/Step4";
 
 export default function App() {
     const [selectedRadio, selectRadio] = useState(null);
     const [currentStep, setStep] = useState(0);
     const [songs, setSongs] = useState([]);
+    const [spotifySongs, setSpotifySongs] = useState(null);
     const [timeRange, setTimeRange] = useState({
         startDate: subDays(new Date(), 7),
         startHour: 7,
@@ -64,6 +66,15 @@ export default function App() {
                 timeRange={timeRange}
                 songs={songs}
                 setSongs={setSongs}
+            />
+            <Step4
+                active={currentStep === 3}
+                onForward={moveForward}
+                onBackward={moveBackward}
+                radioSongs={songs}
+                spotifySongs={spotifySongs}
+                setSpotifySongs={setSpotifySongs}
+                setRadioSongs={setSongs}
             />
         </>
     )

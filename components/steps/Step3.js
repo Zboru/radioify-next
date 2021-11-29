@@ -51,7 +51,7 @@ export default function Step3({active, onForward, onBackward, timeRange, songs, 
                 <Btn onClick={startSearch}>Szukaj</Btn>
                 <div className="flex-grow"/>
                 <Btn className="mr-2" onClick={onBackward}>Wstecz</Btn>
-                <Btn disabled={!songs.length} onClick={onForward}>Dalej</Btn>
+                <Btn disabled={songs && !songs.length} onClick={onForward}>Dalej</Btn>
             </div>
         </Card>
     )
