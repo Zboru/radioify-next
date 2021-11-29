@@ -9,7 +9,11 @@ module.exports = {
         md: '850px'
       }
     },
-    extend: {},
+    extend: {
+      width: {
+        'fit-content': 'fit-content'
+      }
+    },
   },
   variants: {
     extend: {},
