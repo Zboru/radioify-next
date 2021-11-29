@@ -16,7 +16,7 @@ export default function Step1({onForward, active, selectRadio, selectedRadio}) {
                 setRadiolist(radioMap);
             })
         }
-    }, [])
+    })
 
     return (
         <Card active={active}>

@@ -10,7 +10,7 @@ export default function GithubLink() {
     }
     return (
         <div className="flex items-center">
-            <a href="https://github.com/zboru/radioify-next" target="_blank">
+            <a rel="noreferrer" href="https://github.com/zboru/radioify-next" target="_blank">
                 <MdiGithub className="w-6 h-6"/>
             </a>
         </div>
