@@ -30,7 +30,7 @@ export default function Step1({onForward, active, selectRadio, selectedRadio}) {
             </label>
             <div className="flex">
                 <div className="flex-grow"/>
-                <Btn disabled={!selectedRadio} className="mt-2" onClick={onForward}>Dalej</Btn>
+                <Btn disabled={selectedRadio === null} className="mt-2" onClick={onForward}>Dalej</Btn>
             </div>
         </Card>
     )
