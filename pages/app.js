@@ -2,10 +2,12 @@ import {useState} from "react";
 import Step1 from "../components/steps/Step1";
 import Step2 from "../components/steps/Step2";
 import subDays from "date-fns/subDays";
+import Step3 from "../components/steps/Step3";
 
 export default function App() {
     const [selectedRadio, selectRadio] = useState(null);
     const [currentStep, setStep] = useState(0);
+    const [songs, setSongs] = useState([]);
     const [timeRange, setTimeRange] = useState({
         startDate: subDays(new Date(), 7),
         startHour: 7,
@@ -54,6 +56,14 @@ export default function App() {
                    onHourChange={setHours}
                    onStartDateChange={setStartDate}
                    onEndDateChange={setEndDate}
+            />
+            <Step3
+                active={currentStep === 2}
+                onForward={moveForward}
+                onBackward={moveBackward}
+                timeRange={timeRange}
+                songs={songs}
+                setSongs={setSongs}
             />
         </>
     )
