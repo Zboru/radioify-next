@@ -6,6 +6,8 @@ import Step3 from "../components/steps/Step3";
 import Step4 from "../components/steps/Step4";
 import Stepper from "../components/general/Stepper";
 import StepperStep from "../components/general/StepperStep";
+import Step5 from "../components/steps/Step5";
+import Step6 from "../components/steps/Step6";
 
 export default function App() {
     const [selectedRadio, selectRadio] = useState(null);
@@ -84,6 +86,7 @@ export default function App() {
                 timeRange={timeRange}
                 songs={songs}
                 setSongs={setSongs}
+                radio={selectedRadio}
             />
             <Step4
                 active={currentStep === 3}
@@ -93,6 +96,16 @@ export default function App() {
                 spotifySongs={spotifySongs}
                 setSpotifySongs={setSpotifySongs}
                 setRadioSongs={setSongs}
+            />
+            <Step5
+                active={currentStep === 4}
+                onForward={moveForward}
+                onBackward={moveBackward}
+                spotifySongs={spotifySongs}
+                songList={songs}
+            />
+            <Step6
+                active={currentStep === 5}
             />
         </div>
     )
