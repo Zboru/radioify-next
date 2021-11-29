@@ -4,7 +4,7 @@ import {useSessionStorage} from "../../hooks/useSessionStorage";
 import {useEffect} from "react";
 import Btn from "../general/Btn";
 
-export default function Step1({onForward, active, selectRadio, selectedRadio,}) {
+export default function Step1({onForward, active, selectRadio, selectedRadio}) {
     const [radioList, setRadiolist] = useSessionStorage('radioList', [])
 
     useEffect(() => {
