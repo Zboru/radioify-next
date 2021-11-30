@@ -4,7 +4,7 @@ import {useSessionStorage} from "../../hooks/useSessionStorage";
 import {useEffect} from "react";
 import Btn from "../general/Btn";
 
-export default function Step1({onForward, active, selectRadio, selectedRadio, pusherID}) {
+export default function Step1({onForward, active, selectRadio, selectedRadio}) {
     const [radioList, setRadiolist] = useSessionStorage('radioList', [])
 
     useEffect(() => {
@@ -18,10 +18,6 @@ export default function Step1({onForward, active, selectRadio, selectedRadio, pu
         }
     })
 
-    function test() {
-        fetch(`/api/pusher?id=${pusherID}`)
-    }
-
     return (
         <Card active={active}>
             <p>Skorzystaj z wyszukiwarki, aby wybrać radio, z którego mają być pobrane piosenki. Lista stacji radiowych
@@ -33,7 +29,6 @@ export default function Step1({onForward, active, selectRadio, selectedRadio, pu
                 <Select options={radioList} onChange={selectRadio} inputId='radioSelect' instanceId='radioSelect' placeholder={"Eska"}/>
             </label>
             <div className="flex">
-                <Btn onClick={test}>test</Btn>
                 <div className="flex-grow"/>
                 <Btn disabled={selectedRadio === null} className="mt-2" onClick={onForward}>Dalej</Btn>
             </div>
