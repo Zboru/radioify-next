@@ -8,14 +8,18 @@ import Stepper from "../components/general/Stepper";
 import StepperStep from "../components/general/StepperStep";
 import Step5 from "../components/steps/Step5";
 import Step6 from "../components/steps/Step6";
-import Pusher from "pusher-js";
+import {channelID, pusher} from "../utils/pusher";
+import {useSessionStorage} from "../hooks/useSessionStorage";
+import {useRouter} from "next/router";
 
 export default function App() {
-    const [userID, _] = useState(Date.now())
+    const router = useRouter();
     const [selectedRadio, selectRadio] = useState(null);
     const [currentStep, setStep] = useState(0);
     const [songs, setSongs] = useState([]);
     const [spotifySongs, setSpotifySongs] = useState(null);
+    const [spotifyProfile, setProfile] = useSessionStorage('spoitfyProfile', null);
+    const [spotifyToken, setToken] = useSessionStorage('spotifyToken', null)
     const [timeRange, setTimeRange] = useState({
         startDate: subDays(new Date(), 7),
         startHour: 7,
@@ -52,18 +56,18 @@ export default function App() {
     }
 
     useEffect(() => {
-        Pusher.logToConsole = true;
-        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
-            cluster: "eu"
-        })
-        const channel = pusher.subscribe(`${userID}`);
-        channel.bind("spotifySongs", function (data) {
-            console.log(data);
-        });
         return () => {
-            pusher.unsubscribe(`${userID}`);
+            pusher.unsubscribe(channelID);
         };
     }, [])
+
+    useEffect(() => {
+        if (!spotifyToken || !spotifyProfile || spotifyToken.expires_in < Date.now()) {
+            setProfile(null);
+            setToken(null);
+            router.push('/');
+        }
+    })
 
     return (
         <div className="flex flex-col h-full">
@@ -83,7 +87,6 @@ export default function App() {
                    selectRadio={selectRadio}
                    onForward={moveForward}
                    active={currentStep === 0}
-                   pusherID={userID}
             />
             <Step2 onForward={moveForward}
                    onBackward={moveBackward}

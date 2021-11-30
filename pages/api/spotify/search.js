@@ -1,4 +1,8 @@
+import {pusher} from "../pusher";
+
 const {spotifyApi} = require("../../../utils/spotify");
+
+let currentProgress = 0;
 
 async function findSpotifyTrack(song) {
     const songDetails = song.split(' - ');
@@ -20,7 +24,8 @@ async function findSpotifyTrack(song) {
     }
 }
 
-async function fetchTracks(access_token, songs) {
+async function fetchTracks(access_token, pusherID, songs) {
+    currentProgress = 0;
     spotifyApi.setAccessToken(access_token);
     const notFoundSongs = [];
     const tracks = [];
@@ -31,6 +36,10 @@ async function fetchTracks(access_token, songs) {
         } else {
             tracks.push(track);
         }
+        currentProgress += 1;
+        await pusher.trigger(pusherID, "spotifyProgress", {
+            status: currentProgress
+        });
     }
     return {tracks, notFoundSongs};
 }
@@ -42,7 +51,8 @@ export default async function handler(req, res) {
     }
     const reqBody = JSON.parse(req.body);
     const token = reqBody.token;
+    const pusherID = reqBody.pusherID
     const radioSongs = reqBody.songs;
-    const tracks = await fetchTracks(token, radioSongs);
+    const tracks = await fetchTracks(token, pusherID, radioSongs);
     res.status(200).json({ data: tracks })
 }

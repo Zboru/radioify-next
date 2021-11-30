@@ -1,23 +1,21 @@
 import Btn from "../general/Btn";
 import Card from "../general/Card";
-import {createRef, useState} from "react";
+import {createRef, useEffect, useState} from "react";
 import {LoadingIcon} from "../icons/LoadingIcon";
 import {CheckmarkIcon} from "../icons/CheckmarkIcon";
 import Fuse from "fuse.js";
 import {useSessionStorage} from "../../hooks/useSessionStorage";
+import {channel, channelID} from "../../utils/pusher";
 
 export default function Step4({active, onForward, onBackward, radioSongs, setRadioSongs, spotifySongs, setSpotifySongs}) {
     const [searching, setSearching] = useState(false);
+    const [spotifyProgress, setSpotifyProgress] = useState(0);
     const [songFilter, setSongFilter] = useState(null);
     const [spotifyToken, setTokens] = useSessionStorage('spotifyToken', null);
     const songListContainer = createRef();
 
-    /**
-     * Get possible duration of searching all songs in Spotify
-     * @returns {string}
-     */
-    function searchDuration() {
-        return (radioSongs?.length / 4.8).toFixed(2)
+    function radioTracksCount() {
+        return radioSongs.filter(song => !song.excluded).length
     }
 
     /**
@@ -55,12 +53,19 @@ export default function Step4({active, onForward, onBackward, radioSongs, setRad
 
     }
 
+    useEffect(()=>{
+        channel.bind("spotifyProgress", function (data) {
+            setSpotifyProgress(data.status)
+        });
+    }, [])
+
     function searchSongs() {
         setSearching(true)
+        setSpotifyProgress(0);
         const notExcludedSongs = radioSongs.filter(song => !song.excluded)
         fetch('/api/spotify/search', {
             method: "POST",
-            body: JSON.stringify({songs: notExcludedSongs, token: spotifyToken.token})
+            body: JSON.stringify({songs: notExcludedSongs, token: spotifyToken.token, pusherID: channelID})
         })
             .then(response => response.json())
             .then(response => {
@@ -92,17 +97,17 @@ export default function Step4({active, onForward, onBackward, radioSongs, setRad
                     )
                 })}
             </div>
-            <p className="mt-4">Czy chcesz kontynuować? Ta operacja może potrwać ponad {searchDuration()} sekund.</p>
+            <p className="mt-4">Czy chcesz kontynuować?</p>
             {searching &&
             <p className="text-gray-500 italic flex items-center">
                 <LoadingIcon className="animate-spin"/>
-                <span className="ml-2">Szukam...</span>
+                <span className="ml-2">Szukam... {spotifyProgress} / {radioTracksCount()} utworów</span>
             </p>
             }
             {(!searching && spotifySongs?.tracks && spotifySongs.tracks.length) &&
             <p className="text-gray-500 italic flex items-center">
                 <CheckmarkIcon/>
-                <span className="ml-2">Znalazłem ponad {spotifySongs.tracks.length} piosenek!</span>
+                <span className="ml-2">Znalazłem ponad {spotifySongs.tracks.length} utworów!</span>
             </p>
             }
             <div className="flex mt-2">
