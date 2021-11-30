@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Step1 from "../components/steps/Step1";
 import Step2 from "../components/steps/Step2";
 import subDays from "date-fns/subDays";
@@ -8,8 +8,10 @@ import Stepper from "../components/general/Stepper";
 import StepperStep from "../components/general/StepperStep";
 import Step5 from "../components/steps/Step5";
 import Step6 from "../components/steps/Step6";
+import Pusher from "pusher-js";
 
 export default function App() {
+    const [userID, _] = useState(Date.now())
     const [selectedRadio, selectRadio] = useState(null);
     const [currentStep, setStep] = useState(0);
     const [songs, setSongs] = useState([]);
@@ -49,6 +51,20 @@ export default function App() {
         return Math.abs(currentStep - index) < 2 || index === 2;
     }
 
+    useEffect(() => {
+        Pusher.logToConsole = true;
+        const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY, {
+            cluster: "eu"
+        })
+        const channel = pusher.subscribe(`${userID}`);
+        channel.bind("spotifySongs", function (data) {
+            console.log(data);
+        });
+        return () => {
+            pusher.unsubscribe(`${userID}`);
+        };
+    }, [])
+
     return (
         <div className="flex flex-col h-full">
             <Stepper className={'my-4 px-4 sm:p-0'}>
@@ -67,6 +83,7 @@ export default function App() {
                    selectRadio={selectRadio}
                    onForward={moveForward}
                    active={currentStep === 0}
+                   pusherID={userID}
             />
             <Step2 onForward={moveForward}
                    onBackward={moveBackward}
