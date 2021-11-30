@@ -28,7 +28,7 @@ export default async function handler(req, res) {
 
     spotifyApi.setAccessToken(reqBody.token);
     const playlist = reqBody.playlist;
-    const songs = reqBody.songs.tracks;
+    const songs = reqBody.songs;
     const snapshots = await addToPlaylist(playlist, songs);
     res.status(200).json({
             data: snapshots

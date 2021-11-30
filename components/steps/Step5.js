@@ -26,7 +26,7 @@ export default function Step5({onForward, onBackward, active, spotifySongs, song
         }) ?? [];
         fetch('/api/spotify/syncPlaylist', {
             method: "POST",
-            body: JSON.stringify({playlist: selectedPlaylist, songs: spotifySongs, token: spotifyToken.token})
+            body: JSON.stringify({playlist: selectedPlaylist, songs: songsURIs, token: spotifyToken.token})
         })
             .then(response => response.json())
             .then(response => {
